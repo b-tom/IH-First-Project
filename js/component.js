@@ -1,4 +1,4 @@
-class Component{
+class Block{
     constructor(game, x, y, width, height){
         this.game = game;
         this.x = x;
@@ -7,8 +7,9 @@ class Component{
         this.height = height;
     }
 
-    drawComponent(){
+    drawBlock(x, y){
         const theCtx = this.game.ctx;
-        theCtx.fillRect(this.x, this.y, this.width, this.height);
+        theCtx.strokeSyle = 'white';
+        theCtx.fillRect(x, y, this.width, this.height);
     }
 }
