@@ -1,18 +1,22 @@
 class Ball{
-    constructor(game, x, y, width, height, velX, velY){
+    constructor(game, x, y, radius, velX, velY, color){
         this.game = game;
         this.x = x;
         this.y = y;
-        this.height = height;
-        this.width = width;
+        this.radius = radius;
         this.velX = velX; //declared for ball movement
         this.velY = velY;
-        this.img = new Image();
+        this.startAngle = 0;
+        this.endAngle = Math.PI*2;
+        this.color = color
     }
 
     drawBall(){
-        const ctx = this.game.ctx
-        this.img.src = './images/ball.png';
-        ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+        const myCtx = this.game.ctx
+        myCtx.beginPath();
+        myCtx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
+        myCtx.fillStyle = this.color;
+        myCtx.fill();
+        myCtx.closePath();
     }
 }

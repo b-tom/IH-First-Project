@@ -26,4 +26,10 @@ class Player {
             }
         });
     }
+
+    mouseMove(){
+        window.addEventListener('mousemove', e =>{
+            this.x = e.screenX;
+        })
+    }
 }
