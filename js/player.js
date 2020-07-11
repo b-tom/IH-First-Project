@@ -9,7 +9,11 @@ class Player {
 
     drawPlayer(){
         const theCtx = this.game.ctx;
+        theCtx.fillStyle = "#2e3548";
         theCtx.fillRect(this.x, this.y, this.width, this.height);
+        theCtx.lineWidth = 2
+        theCtx.strokeStyle= 'white';
+        theCtx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
     move(){
@@ -29,7 +33,7 @@ class Player {
 
     mouseMove(){
         window.addEventListener('mousemove', e =>{
-            this.x = e.screenX;
+          this.x = e.clientX;
         })
     }
 }

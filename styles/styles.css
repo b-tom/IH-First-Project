@@ -6,3 +6,31 @@
     display: flex;
     justify-content: center;
 }
+.sound{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+#sound{
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    top:465px;
+}
+#gameOver{
+    position:absolute;
+    width: 800px;
+    height:500px;
+    background: rgba(0,0,0,0.5);
+    display:none;
+}
+#youLost{
+    width:800px;
+    position: absolute;
+    display:none;
+}
+#restart{
+    width:50px;
+    padding:350px;
+    /* cursor: pointer; */
+}

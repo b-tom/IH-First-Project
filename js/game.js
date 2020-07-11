@@ -3,102 +3,38 @@ class Game {
         this.canvas = undefined;
         this.ctx = undefined;
         this.spaceship = new Player(this, 400, 480, 50, 10);
-        this.ball = new Ball(this, 400, 475, 5, 2, -2, 'white');
-        this.block = new Block (this,0, 0, 47, 10);
+        this.ball = new Ball(this, 400, 475, 5, 3, 2, -2, 'white');
+        this.block = new Block (this, 2 , 11, 57, 15, 15, 10, 40, 'grey', 'white', true);
         this.score = 0;
+        this.scoreUnit = 10;
         this.level = 1;
         this.wallOfBlocks = [];
-        this.lives = 3;
+        this.life = 3;
+        this.gameOver = false;
+        this.soundElement = undefined;
     }
 
     init(){
         this.canvas = document.querySelector('#canvas')
         this.ctx = this.canvas.getContext('2d');
-        this.drawBackground();
-        this.drawMainCharacter();
-        this.spaceship.move();
         this.createBlocks();
-
+        this.spaceship.move();
+        
         const draw = () => {
             this.clear();
             this.drawBackground();
             this.drawMainCharacter();
-            this.spaceship.mouseMove();
             this.createBall();    
-            for(let i=0; i<this.wallOfBlocks.length; i++){
-                this.wallOfBlocks[i].drawBlock();
-                //block botom colission 
-                if(this.ball.y - this.ball.radius <= this.wallOfBlocks[i].y + this.wallOfBlocks[i].height && 
-                    this.ball.y + this.ball.radius > this.wallOfBlocks[i].y + this.wallOfBlocks[i].height && 
-                    this.ball.x >= this.wallOfBlocks[i].x && 
-                    this.ball.x  <= this.wallOfBlocks[i].x + this.wallOfBlocks[i].width){
-                        this.ball.velY = -this.ball.velY;
-                        this.score++;
-                        this.wallOfBlocks.splice(i,1);
-                }
-                //block top colission
-                else if(this.ball.y + this.ball.radius >= this.wallOfBlocks[i].y && 
-                    this.ball.y - this.ball.radius < this.wallOfBlocks[i].y && 
-                    this.ball.x >= this.wallOfBlocks[i].x && 
-                    this.ball.x <= this.wallOfBlocks[i].x + this.wallOfBlocks[i].width){
-                        this.ball.velY = -this.ball.velY;
-                        this.score++;
-                        this.wallOfBlocks.splice(i,1)
-                }
-                //block right colission
-                else if(this.ball.x + this.ball.radius >= this.wallOfBlocks[i].x &&
-                    this.ball.x - this.ball.radius < this.wallOfBlocks[i].x &&
-                    this.ball.y >= this.wallOfBlocks[i].y &&
-                    this.ball.y < this.wallOfBlocks[i].y + this.wallOfBlocks[i].height){
-                        this.ball.velX = -this.ball.velX;
-                        this.score++;
-                        this.wallOfBlocks.splice(i,1);
-                }
-                //block left colission
-                else if(this.ball.x -this.ball.radius <= this.wallOfBlocks[i].x + this.wallOfBlocks[i].width &&
-                    this.ball.x + this.ball.radius > this.wallOfBlocks[i].x + this.wallOfBlocks[i].width && 
-                    this.ball.y >= this.wallOfBlocks[i].y &&
-                    this.ball.y < this.wallOfBlocks[i].y + this.wallOfBlocks[i].height){
-                        this.ball.velX = -this.ball.velX;
-                        this.score++;
-                        this.wallOfBlocks.splice(i,1);
-                }
-            }
-            
-            //ball movement
-            this.ball.x += this.ball.velX; 
-            this.ball.y += this.ball.velY;
+            this.moveBall();
+            this.bounce();
+            this.drawBlocks();
+            this.ballBrickCollision();
+            this.changelevel();
+            this.gameOverFunction();
 
-            //walls bounce
-            if(this.ball.x + this.ball.radius >= this.canvas.width || this.ball.x - this.ball.radius <= 0){
-                this.ball.velX = -this.ball.velX;
+            if(!this.gameOver){
+                window.requestAnimationFrame(draw);
             }
-            //top bounce
-            if(this.ball.y - this.ball.radius <=0){
-                this.ball.velY = -this.ball.velY;
-            }
-            //player bounce
-            if(this.ball.y + this.ball.radius >= this.spaceship.y && 
-                this.ball.x >= this.spaceship.x + this.spaceship.width * 0.25 && //if ball hits on the center if the spaceship, continues at the same direction and speed
-                this.ball.x <= (this.spaceship.x + this.spaceship.width) - (this.spaceship.width * 0.25)){
-                   this.ball.velY = -this.ball.velY; 
-            }else if(this.ball.y + this.ball.radius >= this.spaceship.y && //if the ball hits on the left 25% of the spaceship, the ball will go to the left at a higher speed
-                this.ball.x >= this.spaceship.x &&
-                this.ball.x <= this.spaceship.x + this.spaceship.width * 0.25){
-                    this.ball.velY = -this.ball.velY;
-                    this.ball.velX = -5;
-            }else if(this.ball.y + this.ball.radius >= this.spaceship.y && //same as previous comment but to the right
-                this.ball.x >= this.spaceship.x + this.spaceship.width * 0.75 &&
-                this.ball.x <= this.spaceship.x + this.spaceship.width){
-                    this.ball.velY = -this.ball.velY;
-                    this.ball.velX = 5;
-            }else if(this.ball.y + this.ball.radius > this.spaceship.y + 3){ //if ball goes beyond the spaceship, it continues going    
-                this.lives --;
-                this.ball.x = 400;
-                this.ball.y = 475
-                this.ball.velY = -this.ball.velY;
-            }
-            window.requestAnimationFrame(draw);
         };
         draw();
     }
@@ -115,7 +51,7 @@ class Game {
         const lives = new Image()
         lives.src = './images/heart.png';
         let coordinateX = 410;
-        for(let i=0; i < this.lives ; i++ ){
+        for(let i=0; i < this.life ; i++ ){
             this.ctx.drawImage(lives, coordinateX, 13, 15, 15);
             coordinateX +=20;
         }
@@ -133,26 +69,112 @@ class Game {
         this.ball.drawBall();
     }
 
+    moveBall(){
+        this.ball.x += this.ball.velX; 
+        this.ball.y += this.ball.velY;
+    }
+
+    resetball(){
+        this.ball.x = 400;
+        this.ball.y = 475;
+        this.ball.velX = 3 * (Math.random()* 2-1);
+        this.ball.velY = -3;
+    }
+
+    bounce(){
+        //walls bounce
+        if(this.ball.x + this.ball.velX >= this.canvas.width -this.ball.radius || this.ball.x + this.ball.velX <= this.ball.radius){
+            this.ball.velX = -this.ball.velX;
+
+        }
+        //top bounce
+        if(this.ball.y + this.ball.velY <= this.ball.radius){
+            this.ball.velY = -this.ball.velY;
+        }
+        if(this.ball.y + this.ball.radius > this.canvas.height){
+            this.life --;
+            life_lost_sound.play();
+            this.resetball();
+        }
+        // player bounce
+        if(this.ball.y + this.ball.radius > this.spaceship.y && this.ball.y + this.ball.radius < this.spaceship.y + this.spaceship.height && this.ball.x > this.spaceship.x && this.ball.x < this.spaceship.x + this.spaceship.width){
+            let collidePoint = this.ball.x - (this.spaceship.x + this.spaceship.width/2);
+            collidePoint = collidePoint / (this.spaceship.width/2);
+            let angle = collidePoint * (Math.PI/3);
+            this.ball.velX = this.ball.speed * Math.sin(angle);
+            this.ball.velY = - this.ball.speed * Math.cos(angle);   
+            hit_spaceship_sound.play();
+        }
+    }
+
     createBlocks(){
-        switch(this.level){
-            case 1:
-                let array = [];    
-                for (let i=200 ; i<600; i+=50){
-                    for (let j=60 ; j<200; j+=20){
-                        let obstacle = new Block(this,i, j, 47, 15);
-                        array.push(obstacle);
+        for(let r=0 ; r<this.block.row ; r++){
+            this.wallOfBlocks[r]= [];
+            for(let c=0 ; c< this.block.column ; c++){
+                this.wallOfBlocks[r][c] = {
+                    x: c * (this.block.offSetLeft + this.block.width) + this.block.offSetLeft ,
+                    y: r * (this.block.offSetTop + this.block.height ) + this.block.offSetTop + this.block.marginTop,
+                    status: true,
+                }
+            }
+        }
+    }
+
+    drawBlocks(){
+        for(let r=0 ; r<this.block.row ; r++){
+            for(let c=0 ; c< this.block.column ; c++){
+            let b = this.wallOfBlocks[r][c]
+            if(b.status){
+                this.ctx.fillStyle = this.block.fillColor;
+                this.ctx.fillRect(b.x, b.y, this.block.width, this.block.height);
+                this.ctx.strokeStyle = this.block.strokeColor;
+                this.ctx.strokeRect(b.x, b.y, this.block.width, this.block.height);
+            }
+           }
+        }
+    }
+
+    ballBrickCollision(){
+        for(let r=0 ; r<this.block.row ; r++){
+            for(let c=0 ; c< this.block.column ; c++){
+                let b = this.wallOfBlocks[r][c]
+                if(b.status){
+                    if(this.ball.x + this.ball.radius > b.x && this.ball.x - this.ball.radius < b.x + this.block.width &&
+                        this.ball.y + this.ball.radius > b.y &&
+                        this.ball.y - this.ball.radius < b.y + this.block.height){
+                            this.ball.velY = -this.ball.velY;
+                            b.status = false;
+                            this.score += this.scoreUnit;
+                            hit_brick_sound.play();
+
                     }
                 }
-                this.wallOfBlocks = array;
-                break;
-            case 2:
-                    this.wallOfBlocks.push(this.block.drawBlock(this.canvas.width/2,40))
-                    this.wallOfBlocks.push(this.block.drawBlock(this.canvas.width/2 + 20,55))
-                    this.wallOfBlocks.push(this.block.drawBlock(this.canvas.width/2 - 20,55))
-                break
-            default:
-                console.log('hi');        
-        } 
+            }
+        }
+    }
+
+    gameOverFunction(){
+        if(this.life < 0){
+            this.gameOver = true;
+            game_over_sound.play();
+            showYouLost();
+        }
+    }
+    
+    changelevel(){
+        let levelCompleted = true;
+
+        for(let r=0 ; r<this.block.row ; r++){
+            for(let c=0 ; c< this.block.column ; c++){
+                levelCompleted = levelCompleted && !this.wallOfBlocks[r][c].status;
+            }
+        }
+        if(levelCompleted){
+            this.level ++
+            this.block.row = Math.floor(Math.random() * 8);
+            this.createBlocks()
+            this.ball.speed += 0.5;
+            this.resetball();
+        }
     }
 }
-

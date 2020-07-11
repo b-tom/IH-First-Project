@@ -1,9 +1,10 @@
 class Ball{
-    constructor(game, x, y, radius, velX, velY, color){
+    constructor(game, x, y, radius, speed, velX, velY, color){
         this.game = game;
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.speed = 3;
         this.velX = velX; //declared for ball movement
         this.velY = velY;
         this.startAngle = 0;
