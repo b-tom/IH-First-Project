@@ -4,12 +4,12 @@ class Ball{
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.speed = 3;
+        this.speed = speed;
         this.velX = velX; //declared for ball movement
         this.velY = velY;
         this.startAngle = 0;
-        this.endAngle = Math.PI*2;
-        this.color = color
+        this.endAngle = Math.PI * 2;
+        this.color = color;
     }
 
     drawBall(){

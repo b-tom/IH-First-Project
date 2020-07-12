@@ -2,7 +2,7 @@ class Game {
     constructor(){
         this.canvas = undefined;
         this.ctx = undefined;
-        this.spaceship = new Player(this, 400, 480, 50, 10);
+        this.spaceship = new Player(this, 400, 460, 80, 15);
         this.ball = new Ball(this, 400, 475, 5, 3, 2, -2, 'white');
         this.block = new Block (this, 2 , 11, 57, 15, 15, 10, 40, 'grey', 'white', true);
         this.score = 0;
@@ -11,7 +11,7 @@ class Game {
         this.wallOfBlocks = [];
         this.life = 3;
         this.gameOver = false;
-        this.soundElement = undefined;
+        this.pill = new Pill(this, 0, 0, lives, 2);
     }
 
     init(){
@@ -28,6 +28,7 @@ class Game {
             this.moveBall();
             this.bounce();
             this.drawBlocks();
+            // this.lifedrop();
             this.ballBrickCollision();
             this.changelevel();
             this.gameOverFunction();
@@ -40,16 +41,12 @@ class Game {
     }
         
     drawBackground(){
-        const space = new Image();
-        space.src = './images/space.gif';
         this.ctx.drawImage(space,0 ,0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = 'white';
         this.ctx.font = '15px monospace';
         this.ctx.fillText(`Score: ${this.score}`, 700, 25);
         this.ctx.fillText(`Level: ${this.level}`, 25, 25);
         this.ctx.fillText(`Lives:`, (this.canvas.width/2)-50, 25);
-        const lives = new Image()
-        lives.src = './images/heart.png';
         let coordinateX = 410;
         for(let i=0; i < this.life ; i++ ){
             this.ctx.drawImage(lives, coordinateX, 13, 15, 15);
@@ -85,7 +82,6 @@ class Game {
         //walls bounce
         if(this.ball.x + this.ball.velX >= this.canvas.width -this.ball.radius || this.ball.x + this.ball.velX <= this.ball.radius){
             this.ball.velX = -this.ball.velX;
-
         }
         //top bounce
         if(this.ball.y + this.ball.velY <= this.ball.radius){
@@ -146,7 +142,6 @@ class Game {
                             b.status = false;
                             this.score += this.scoreUnit;
                             hit_brick_sound.play();
-
                     }
                 }
             }
@@ -177,4 +172,23 @@ class Game {
             this.resetball();
         }
     }
+
+    // lifedrop(){
+    //     for(let r=0 ; r<this.block.row ; r++){
+    //         for(let c=0 ; c< this.block.column ; c++){
+    //             let b = this.wallOfBlocks[r][c]
+    //             if(b.status){
+    //                 if(this.ball.x + this.ball.radius > b.x && this.ball.x - this.ball.radius < b.x + this.block.width &&
+    //                     this.ball.y + this.ball.radius > b.y &&
+    //                     this.ball.y - this.ball.radius < b.y + this.block.height){
+    //                         // if(Math.floor(Math.random()*10) % 3 === 0){
+    //                             this.pill.drawPill(this.ball.x, this.ball.y);
+    //                             this.pill.y += this.pill.velY;
+    //                             console.log('pill')
+    //                         // }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }

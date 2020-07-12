@@ -1,10 +1,14 @@
+body{
+    background-color: black;
+}
+
 #canvas{
     border: solid 1px black;
     cursor: none;
 }
 .content{
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
 }
 .sound{
     display: flex;
@@ -31,6 +35,11 @@
 }
 #restart{
     width:50px;
-    padding:350px;
-    /* cursor: pointer; */
+    padding-left:400px;
+    padding-top: 350px;
+}
+h1{
+   color:white;
+   font-family: monospace; 
+   font-size: 3.2em;
 }
