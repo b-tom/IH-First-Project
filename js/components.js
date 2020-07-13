@@ -21,3 +21,5 @@ hit_spaceship_sound.src = "./sounds/hit_spaceship.mp3";
 const life_lost_sound = new Audio();
 life_lost_sound.src = "./sounds/life_lost.mp3";
 
+const hit_wall_sound = new Audio();
+hit_wall_sound.src = './sounds/hit_wall.mp3'

@@ -3,7 +3,7 @@ class Game {
         this.canvas = undefined;
         this.ctx = undefined;
         this.spaceship = new Player(this, 400, 460, 80, 15);
-        this.ball = new Ball(this, 400, 475, 5, 3, 2, -2, 'white');
+        this.ball = new Ball(this, 400, 475, 5, 4, 4, -4, 'white');
         this.block = new Block (this, 2 , 11, 57, 15, 15, 10, 40, 'grey', 'white', true);
         this.score = 0;
         this.scoreUnit = 10;
@@ -28,9 +28,9 @@ class Game {
             this.moveBall();
             this.bounce();
             this.drawBlocks();
-            // this.lifedrop();
+            this.pillDrop();
             this.ballBrickCollision();
-            this.changelevel();
+            this.changeLevel();
             this.gameOverFunction();
 
             if(!this.gameOver){
@@ -81,10 +81,12 @@ class Game {
     bounce(){
         //walls bounce
         if(this.ball.x + this.ball.velX >= this.canvas.width -this.ball.radius || this.ball.x + this.ball.velX <= this.ball.radius){
+            hit_wall_sound.play();
             this.ball.velX = -this.ball.velX;
         }
         //top bounce
         if(this.ball.y + this.ball.velY <= this.ball.radius){
+            hit_wall_sound.play();
             this.ball.velY = -this.ball.velY;
         }
         if(this.ball.y + this.ball.radius > this.canvas.height){
@@ -156,7 +158,7 @@ class Game {
         }
     }
     
-    changelevel(){
+    changeLevel(){
         let levelCompleted = true;
 
         for(let r=0 ; r<this.block.row ; r++){
@@ -173,22 +175,24 @@ class Game {
         }
     }
 
-    // lifedrop(){
-    //     for(let r=0 ; r<this.block.row ; r++){
-    //         for(let c=0 ; c< this.block.column ; c++){
-    //             let b = this.wallOfBlocks[r][c]
-    //             if(b.status){
-    //                 if(this.ball.x + this.ball.radius > b.x && this.ball.x - this.ball.radius < b.x + this.block.width &&
-    //                     this.ball.y + this.ball.radius > b.y &&
-    //                     this.ball.y - this.ball.radius < b.y + this.block.height){
-    //                         // if(Math.floor(Math.random()*10) % 3 === 0){
-    //                             this.pill.drawPill(this.ball.x, this.ball.y);
-    //                             this.pill.y += this.pill.velY;
-    //                             console.log('pill')
-    //                         // }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    
+
+    pillDrop(){
+        for(let r=0 ; r<this.block.row ; r++){
+            for(let c=0 ; c< this.block.column ; c++){
+                let b = this.wallOfBlocks[r][c]
+                if(b.status){
+                    if(this.ball.x + this.ball.radius > b.x && this.ball.x - this.ball.radius < b.x + this.block.width &&
+                        this.ball.y + this.ball.radius > b.y &&
+                        this.ball.y - this.ball.radius < b.y + this.block.height){
+                            // if(Math.floor(Math.random()*10) % 3 === 0){
+                                this.pill.drawPill(this.ball.x, this.ball.y);
+                                this.pill.y += this.pill.velY;
+                                console.log('pill')
+                            // }
+                    }
+                }
+            }
+        }
+    }
 }
