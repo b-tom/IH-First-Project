@@ -5,6 +5,9 @@ space.src = './images/space.gif';
 const lives = new Image()
 lives.src = './images/heart.png';
 
+const skull = new Image();
+skull.src = './images/skull.png'
+
 //audio
 const game_over_sound = new Audio();
 game_over_sound.src = "./sounds/game_over.mp3"

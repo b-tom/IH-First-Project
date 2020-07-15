@@ -12,6 +12,9 @@ class Game {
         this.life = 3;
         this.gameOver = false;
         this.pill = new Pill(this, 0, 0, lives, 2);
+        this.pill2 = new Pill(this, 0, 0, skull, 2);
+        this.fallingPill = false;
+        this.fallingPill2 = false;
     }
 
     init(){
@@ -28,11 +31,12 @@ class Game {
             this.moveBall();
             this.bounce();
             this.drawBlocks();
-            this.pillDrop();
+            this.pillGenerator();
+            this.createPill()
+            this.spaceshipPillCollision()
             this.ballBrickCollision();
             this.changeLevel();
             this.gameOverFunction();
-
             if(!this.gameOver){
                 window.requestAnimationFrame(draw);
             }
@@ -151,7 +155,7 @@ class Game {
     }
 
     gameOverFunction(){
-        if(this.life < 0){
+        if(this.life === 0){
             this.gameOver = true;
             game_over_sound.play();
             showYouLost();
@@ -175,9 +179,7 @@ class Game {
         }
     }
 
-    
-
-    pillDrop(){
+    pillGenerator(){
         for(let r=0 ; r<this.block.row ; r++){
             for(let c=0 ; c< this.block.column ; c++){
                 let b = this.wallOfBlocks[r][c]
@@ -185,14 +187,47 @@ class Game {
                     if(this.ball.x + this.ball.radius > b.x && this.ball.x - this.ball.radius < b.x + this.block.width &&
                         this.ball.y + this.ball.radius > b.y &&
                         this.ball.y - this.ball.radius < b.y + this.block.height){
-                            // if(Math.floor(Math.random()*10) % 3 === 0){
-                                this.pill.drawPill(this.ball.x, this.ball.y);
-                                this.pill.y += this.pill.velY;
-                                console.log('pill')
-                            // }
+                            if(Math.floor(Math.random()*10) % 3 === 0){
+                                this.pill.x = b.x + 28;
+                                this.pill.y = b.y + this.block.height;
+                                this.fallingPill = true;
+                            }else if(Math.floor(Math.random()*10) % 2 === 0){
+                                this.pill2.x = b.x + 28;
+                                this.pill2.y = b.y + this.block.height;
+                                this.fallingPill2 = true;
+                            }
                     }
                 }
             }
         }
     }
+
+    createPill(){
+        if(this.fallingPill === true){
+            this.pill.drawPill();
+            this.pill.y += this.pill.velY;
+        }if(this.fallingPill2 === true){
+            this.pill2.drawPill();
+            this.pill2.y += this.pill2.velY;
+        }
+    }
+
+    spaceshipPillCollision(){
+        if(this.pill.y + this.pill.height > this.spaceship.y  && this.pill.y + this.pill.height < this.spaceship.y + this.spaceship.height &&
+            this.pill.x > this.spaceship.x && this.pill.x + this.pill.width < this.spaceship.x + this.spaceship.width){
+            this.life ++;
+            get_coin_sound.play()
+            this.pill.x = 900;
+            this.pill.y = 700
+            this.fallingPill = false;
+        }if(this.pill2.y + this.pill2.height > this.spaceship.y  && this.pill2.y + this.pill2.height < this.spaceship.y + this.spaceship.height &&
+            this.pill2.x > this.spaceship.x && this.pill2.x + this.pill2.width < this.spaceship.x + this.spaceship.width){
+            this.life --;
+            life_lost_sound.play()
+            this.pill2.x = 900;
+            this.pill2.y = 700
+            this.fallingPill2 = false;
+        }
+    }
+
 }
